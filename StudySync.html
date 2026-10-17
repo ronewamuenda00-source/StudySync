@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudySync | Study Better Together</title>
+
+<style>
+:root {
+  --primary: #5146e5;
+  --dark: #20213a;
+  --muted: #686b80;
+  --background: #f5f6fc;
+  --white: #ffffff;
+  --border: #e5e7f0;
+  --success: #16845b;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--dark);
+  background: var(--background);
+  line-height: 1.5;
+}
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible,
+a:focus-visible {
+  outline: 3px solid #ffbf47;
+  outline-offset: 3px;
+}
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.logo { font-size: 23px; font-weight: 800; color: var(--primary); }
+header p { margin: 0; color: var(--muted); font-size: 14px; }
+.layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  min-height: calc(100vh - 75px);
+}
+nav {
+  padding: 24px 16px;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+}
+nav button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--dark);
+  text-align: left;
+  padding: 12px;
+  border-radius: 9px;
+  margin-bottom: 6px;
+}
+nav button:hover, nav button.active {
+  background: #eeedff;
+  color: var(--primary);
+  font-weight: bold;
+}
+main { padding: 28px; max-width: 1200px; width: 100%; }
+h1 { margin: 0 0 6px; font-size: 30px; }
+h2 { font-size: 20px; margin-top: 0; }
+h3 { font-size: 17px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.page { display: none; }
+.page.active { display: block; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 22px 0;
+}
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 3px 12px #20213a08;
+}
+.stat { font-size: 30px; font-weight: 800; color: var(--primary); }
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+form { display: grid; gap: 12px; }
+label { display: grid; gap: 5px; font-weight: 600; }
+input, select, textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #cfd2e1;
+  border-radius: 8px;
+  background: white;
+  color: var(--dark);
+}
+textarea { min-height: 80px; resize: vertical; }
+.btn {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 15px;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+}
+.btn:hover { filter: brightness(.93); }
+.btn.secondary { background: #eeedff; color: var(--primary); }
+.btn.danger { background: #fff0f0; color: #a22b2b; }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.tag {
+  display: inline-block;
+  background: #eeedff;
+  color: var(--primary);
+  padding: 4px 9px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.list-item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.list-item:last-child { border-bottom: 0; }
+.progress {
+  height: 10px;
+  background: #e8e9f2;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.progress div { height: 100%; background: var(--primary); width: 0; }
+.notice {
+  padding: 12px 14px;
+  background: #eaf8f0;
+  border: 1px solid #b8e7cc;
+  border-radius: 9px;
+  margin: 12px 0;
+}
+.empty { color: var(--muted); padding: 16px 0; }
+footer { padding: 20px; text-align: center; color: var(--muted); }
+@media (max-width: 760px) {
+  .layout { grid-template-columns: 1fr; }
+  nav {
+    display: flex;
+    overflow-x: auto;
+    padding: 8px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  nav button { min-width: max-content; width: auto; margin: 0 4px; }
+  main { padding: 18px 14px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div>
+    <div class="logo">StudySync 📚</div>
+    <p>Study better together.</p>
+  </div>
+  <div class="row">
+    <span id="welcome">Welcome, Student!</span>
+    <button class="btn secondary" onclick="changeUser()">Change name</button>
+  </div>
+</header>
+
+<div class="layout">
+<nav aria-label="Main navigation">
+  <button class="active" data-page="dashboard">🏠 Dashboard</button>
+  <button data-page="groups">👥 Study groups</button>
+  <button data-page="schedule">📅 Study scheduler</button>
+  <button data-page="tasks">✓ Task tracker</button>
+  <button data-page="profile">👤 My profile</button>
+</nav>
+
+<main>
+<section id="dashboard" class="page active">
+  <h1>Your study dashboard</h1>
+  <p class="muted">Keep your study groups, sessions and assignments organised.</p>
+
+  <div class="grid">
+    <div class="card">
+      <p class="muted">Study groups joined</p>
+      <div class="stat" id="groupCount">0</div>
+    </div>
+    <div class="card">
+      <p class="muted">Study sessions</p>
+      <div class="stat" id="sessionCount">0</div>
+    </div>
+    <div class="card">
+      <p class="muted">Tasks completed</p>
+      <div class="stat" id="taskCount">0/0</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Task progress</h2>
+    <div class="progress"><div id="progressBar"></div></div>
+    <p id="progressText" class="muted">0% of tasks completed</p>
+    <button class="btn" onclick="showPage('tasks')">View my tasks</button>
+  </div>
+
+  <div class="card">
+    <h2>Quick actions</h2>
+    <div class="row">
+      <button class="btn" onclick="showPage('groups')">Find a study group</button>
+      <button class="btn secondary" onclick="showPage('schedule')">Plan a session</button>
+      <button class="btn secondary" onclick="showPage('tasks')">Add a task</button>
+    </div>
+  </div>
+</section>
+
+<section id="groups" class="page">
+  <h1>Study groups</h1>
+  <p class="muted">Find students studying the same subjects and join a group.</p>
+
+  <div class="card">
+    <label for="groupSearch">Search groups by name or course</label>
+    <input id="groupSearch" type="search" placeholder="For example, Marketing">
+  </div>
+
+  <div id="groupList"></div>
+
+  <div class="card">
+    <h2>Create a study group</h2>
+    <form id="groupForm">
+      <label>Group name
+        <input name="name" required maxlength="60" placeholder="e.g. Marketing Study Team">
+      </label>
+      <label>Course or module
+        <input name="course" required maxlength="60" placeholder="e.g. Marketing 101">
+      </label>
+      <label>Study method
+        <select name="method">
+          <option>Online</option>
+          <option>In person</option>
+          <option>Hybrid</option>
+        </select>
+      </label>
+      <button class="btn">Create group</button>
+    </form>
+  </div>
+</section>
+
+<section id="schedule" class="page">
+  <h1>Study scheduler</h1>
+  <p class="muted">Plan study sessions and check your upcoming activities.</p>
+
+  <div class="card">
+    <h2>Schedule a session</h2>
+    <form id="sessionForm">
+      <label>Session title
+        <input name="title" required maxlength="80" placeholder="e.g. Test preparation">
+      </label>
+      <label>Study group
+        <select name="group" id="sessionGroup"></select>
+      </label>
+      <label>Date
+        <input type="date" name="date" id="sessionDate" required>
+      </label>
+      <label>Start time
+        <input type="time" name="time" required>
+      </label>
+      <label>Duration
+        <select name="duration">
+          <option value="30">30 minutes</option>
+          <option value="60" selected>1 hour</option>
+          <option value="90">1.5 hours</option>
+          <option value="120">2 hours</option>
+        </select>
+      </label>
+      <button class="btn">Schedule session</button>
+    </form>
+    <p class="small muted">The prototype prevents overlapping sessions on the same date.</p>
+  </div>
+
+  <div class="card">
+    <h2>Upcoming sessions</h2>
+    <div id="sessionList"></div>
+  </div>
+</section>
+
+<section id="tasks" class="page">
+  <h1>Task tracker</h1>
+  <p class="muted">Break assignments into manageable tasks and monitor progress.</p>
+
+  <div class="card">
+    <h2>Add a task</h2>
+    <form id="taskForm">
+      <label>Task name
+        <input name="title" required maxlength="100" placeholder="e.g. Complete research">
+      </label>
+      <label>Due date
+        <input type="date" name="due" required>
+      </label>
+      <label>Assigned to
+        <input name="person" maxlength="60" placeholder="e.g. My name">
+      </label>
+      <button class="btn">Add task</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>My tasks</h2>
+    <div id="taskList"></div>
+  </div>
+</section>
+
+<section id="profile" class="page">
+  <h1>My profile</h1>
+  <p class="muted">Personalise your StudySync experience.</p>
+  <div class="card">
+    <form id="profileForm">
+      <label>Student name
+        <input name="name" id="profileName" required maxlength="60">
+      </label>
+      <label>Email address
+        <input name="email" id="profileEmail" type="email" placeholder="student@example.com">
+      </label>
+      <label>Course or programme
+        <input name="course" id="profileCourse" placeholder="Your course">
+      </label>
+      <button class="btn">Save profile</button>
+    </form>
+    <p class="small muted">
+      This prototype stores demonstration information in this browser only.
+      Do not enter sensitive personal information.
+    </p>
+  </div>
+</section>
+
+<div id="message" class="notice" role="status" aria-live="polite" hidden></div>
+</main>
+</div>
+
+<footer>StudySync prototype | Human-Computer Interaction</footer>
+
+<script>
+const initialGroups = [
+  {id: 1, name: "Marketing Study Team", course: "Marketing 101",
+   method: "Online", joined: false},
+  {id: 2, name: "Business Studies Circle", course: "Business Studies",
+   method: "In person", joined: false},
+  {id: 3, name: "Computer Science Crew", course: "Computer Science",
+   method: "Hybrid", joined: false}
+];
+
+function load(key, fallback) {
+  try {
+    const value = localStorage.getItem("studysync_" + key);
+    return value ? JSON.parse(value) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+function save(key, value) {
+  try {
+    localStorage.setItem("studysync_" + key, JSON.stringify(value));
+  } catch (error) {
+    notify("Your browser could not save the data. It may be in private mode.");
+  }
+}
+
+let groups = load("groups", initialGroups);
+let sessions = load("sessions", []);
+let tasks = load("tasks", []);
+let profile = load("profile", {name: "Student", email: "", course: ""});
+
+function notify(message) {
+  const box = document.getElementById("message");
+  box.textContent = message;
+  box.hidden = false;
+  box.scrollIntoView({behavior: "smooth", block: "nearest"});
+}
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelector(`[data-page="${id}"]`).classList.add("active");
+  document.getElementById("message").hidden = true;
+  render();
+}
+document.querySelectorAll("nav button").forEach(button => {
+  button.addEventListener("click", () => showPage(button.dataset.page));
+});
+
+function changeUser() {
+  const name = prompt("What name would you like StudySync to display?", profile.name);
+  if (name && name.trim()) {
+    profile.name = name.trim();
+    save("profile", profile);
+    render();
+    notify("Your display name has been updated.");
+  }
+}
+
+function renderGroups() {
+  const query = document.getElementById("groupSearch").value.toLowerCase();
+  const filtered = groups.filter(g =>
+    (g.name + " " + g.course).toLowerCase().includes(query));
+  const list = document.getElementById("groupList");
+
+  list.innerHTML = filtered.length ? filtered.map(g => `
+    <div class="card">
+      <div class="row">
+        <div>
+          <h3>${escapeHTML(g.name)}</h3>
+          <p class="muted">${escapeHTML(g.course)} · ${escapeHTML(g.method)}</p>
+          <span class="tag">${g.joined ? "Joined" : "Available to join"}</span>
+        </div>
+        <button class="btn ${g.joined ? "secondary" : ""}"
+          onclick="toggleGroup(${g.id})" ${g.joined ? "disabled" : ""}>
+          ${g.joined ? "Joined ✓" : "Join group"}
+        </button>
+      </div>
+    </div>`).join("") : '<p class="empty">No groups match your search.</p>';
+
+  const options = groups.filter(g => g.joined);
+  document.getElementById("sessionGroup").innerHTML =
+    '<option value="">Personal study session</option>' +
+    options.map(g => `<option>${escapeHTML(g.name)}</option>`).join("");
+}
+function toggleGroup(id) {
+  const group = groups.find(g => g.id === id);
+  if (!group) return;
+  group.joined = true;
+  save("groups", groups);
+  render();
+  notify("You joined " + group.name + ".");
+}
+document.getElementById("groupSearch").addEventListener("input", renderGroups);
+
+document.getElementById("groupForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const data = new FormData(event.target);
+  groups.push({
+    id: Date.now(),
+    name: data.get("name").trim(),
+    course: data.get("course").trim(),
+    method: data.get("method"),
+    joined: true
+  });
+  save("groups", groups);
+  event.target.reset();
+  render();
+  notify("Your study group has been created.");
+});
+
+document.getElementById("sessionDate").min =
+  new Date().toLocaleDateString("en-CA");
+
+document.getElementById("sessionForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const data = new FormData(event.target);
+  const date = data.get("date");
+  const time = data.get("time");
+  const duration = Number(data.get("duration"));
+  const start = new Date(`${date}T${time}`).getTime();
+  const end = start + duration * 60000;
+
+  if (start < Date.now()) {
+    notify("Choose a future date and time for your session.");
+    return;
+  }
+  const conflict = sessions.some(s => {
+    if (s.date !== date) return false;
+    const otherStart = new Date(`${s.date}T${s.time}`).getTime();
+    const otherEnd = otherStart + s.duration * 60000;
+    return start < otherEnd && end > otherStart;
+  });
+  if (conflict) {
+    notify("This session overlaps with another session. Choose another time.");
+    return;
+  }
+  sessions.push({
+    id: Date.now(), title: data.get("title").trim(),
+    group: data.get("group") || "Personal study",
+    date, time, duration
+  });
+  save("sessions", sessions);
+  event.target.reset();
+  render();
+  notify("Your study session has been scheduled.");
+});
+
+function renderSessions() {
+  const list = document.getElementById("sessionList");
+  const sorted = [...sessions].sort((a,b) =>
+    (a.date + a.time).localeCompare(b.date + b.time));
+  list.innerHTML = sorted.length ? sorted.map(s => `
+    <div class="list-item row">
+      <div>
+        <strong>${escapeHTML(s.title)}</strong>
+        <div class="muted small">${escapeHTML(s.group)}</div>
+        <div>${escapeHTML(s.date)} at ${escapeHTML(s.time)} · ${s.duration} min</div>
+      </div>
+      <button class="btn danger" onclick="deleteSession(${s.id})">Delete</button>
+    </div>`).join("") : '<p class="empty">No sessions planned yet.</p>';
+}
+function deleteSession(id) {
+  sessions = sessions.filter(s => s.id !== id);
+  save("sessions", sessions);
+  render();
+  notify("The session was removed.");
+}
+
+document.getElementById("taskForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const data = new FormData(event.target);
+  tasks.push({
+    id: Date.now(), title: data.get("title").trim(),
+    due: data.get("due"), person: data.get("person").trim(),
+    done: false
+  });
+  save("tasks", tasks);
+  event.target.reset();
+  render();
+  notify("Your task has been added.");
+});
+
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  list.innerHTML = tasks.length ? tasks.map(t => `
+    <div class="list-item row">
+      <div>
+        <strong>${escapeHTML(t.title)}</strong>
+        <div class="muted small">Due: ${escapeHTML(t.due)}
+          ${t.person ? " · Assigned to: " + escapeHTML(t.person) : ""}
+        </div>
+        <label class="small">
+          <span>
+            <input type="checkbox" style="width:auto"
+              ${t.done ? "checked" : ""}
+              onchange="toggleTask(${t.id}, this.checked)">
+            ${t.done ? "Completed" : "Mark as completed"}
+          </span>
+        </label>
+      </div>
+      <button class="btn danger" onclick="deleteTask(${t.id})">Delete</button>
+    </div>`).join("") : '<p class="empty">No tasks yet. Add your first task above.</p>';
+}
+function toggleTask(id, checked) {
+  const task = tasks.find(t => t.id === id);
+  if (task) task.done = checked;
+  save("tasks", tasks);
+  render();
+  notify(checked ? "Great work! Task completed." : "Task marked as incomplete.");
+}
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  save("tasks", tasks);
+  render();
+  notify("The task was deleted.");
+}
+
+document.getElementById("profileForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const data = new FormData(event.target);
+  profile = {
+    name: data.get("name").trim(),
+    email: data.get("email").trim(),
+    course: data.get("course").trim()
+  };
+  save("profile", profile);
+  render();
+  notify("Your profile has been saved on this device.");
+});
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  }[char]));
+}
+function render() {
+  document.getElementById("welcome").textContent =
+    "Welcome, " + (profile.name || "Student") + "!";
+  document.getElementById("profileName").value = profile.name || "";
+  document.getElementById("profileEmail").value = profile.email || "";
+  document.getElementById("profileCourse").value = profile.course || "";
+
+  document.getElementById("groupCount").textContent =
+    groups.filter(g => g.joined).length;
+  document.getElementById("sessionCount").textContent = sessions.length;
+  const completed = tasks.filter(t => t.done).length;
+  document.getElementById("taskCount").textContent = completed + "/" + tasks.length;
+  const percent = tasks.length ? Math.round(completed / tasks.length * 100) : 0;
+  document.getElementById("progressBar").style.width = percent + "%";
+  document.getElementById("progressText").textContent =
+    percent + "% of tasks completed";
+
+  renderGroups();
+  renderSessions();
+  renderTasks();
+}
+render();
+</script>
+</body>
+</html>
